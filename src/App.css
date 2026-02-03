@@ -1,0 +1,280 @@
+/* Reset and Base */
+* {
+  box-sizing: border-box;
+}
+
+.app {
+  min-height: 100vh;
+  background: #000;
+  color: #fff;
+  padding: 60px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.container {
+  width: 100%;
+  max-width: 1400px;
+}
+
+/* Header */
+.header {
+  margin-bottom: 60px;
+}
+
+.header h1 {
+  font-size: 42px;
+  font-weight: 300;
+  margin: 0 0 12px 0;
+  letter-spacing: -0.5px;
+}
+
+.header p {
+  font-size: 16px;
+  color: #888;
+  margin: 0;
+}
+
+/* Horizontal Controls */
+.controls-horizontal {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 24px;
+  margin-bottom: 40px;
+  background: #0a0a0a;
+  border: 2px solid #1a1a1a;
+  border-radius: 16px;
+  padding: 32px;
+}
+
+.control-section {
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 768px) {
+  .controls-horizontal {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Grid Layout */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 40px;
+}
+
+/* Results Column */
+.results {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+/* Card - Only for results */
+.card {
+  background: #0a0a0a;
+  border: 2px solid #1a1a1a;
+  border-radius: 16px;
+  padding: 32px;
+}
+
+/* Labels */
+.label {
+  display: block;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: #666;
+  font-weight: 600;
+  margin-bottom: 16px;
+  white-space: nowrap;
+}
+
+/* Strategy Buttons */
+.button-group {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.strategy-btn {
+  background: #111;
+  border: 2px solid #222;
+  border-radius: 10px;
+  padding: 16px 20px;
+  color: #888;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+  flex: 1;
+  min-width: 100px;
+}
+
+.strategy-btn:hover {
+  border-color: #333;
+}
+
+.strategy-btn.active {
+  background: #fff;
+  color: #000;
+  border-color: #fff;
+}
+
+.btn-title {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.btn-desc {
+  font-size: 10px;
+  color: #666;
+}
+
+.strategy-btn.active .btn-desc {
+  color: #666;
+}
+
+/* Inputs */
+.input {
+  width: 100%;
+  height: 56px;
+  background: #111;
+  border: 2px solid #222;
+  border-radius: 12px;
+  padding: 0 20px;
+  font-size: 15px;
+  color: #fff;
+  text-align: center;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.input:focus {
+  border-color: #444;
+}
+
+.input.error {
+  border-color: #dc2626;
+}
+
+select.input {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 20px center;
+}
+
+.input-wrapper {
+  position: relative;
+}
+
+.dollar-sign {
+  position: absolute;
+  left: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #666;
+  font-size: 16px;
+  pointer-events: none;
+}
+
+.input-wrapper .input {
+  padding-left: 48px;
+}
+
+.error-text {
+  color: #dc2626;
+  font-size: 12px;
+  margin-top: 12px;
+}
+
+
+/* Run Button */
+.run-btn {
+  width: 100%;
+  height: 64px;
+  background: #111;
+  border: 2px solid #222;
+  border-radius: 12px;
+  color: #555;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: not-allowed;
+  transition: all 0.2s;
+}
+
+.run-btn.active {
+  background: #fff;
+  color: #000;
+  border-color: #fff;
+  cursor: pointer;
+}
+
+.run-btn.active:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 20px 40px rgba(255, 255, 255, 0.1);
+}
+
+/* Results */
+.chart-placeholder {
+  width: 100%;
+  height: 400px;
+  background: #111;
+  border: 2px solid #222;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #555;
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+}
+
+.results-log {
+  background: #111;
+  border: 2px solid #222;
+  border-radius: 12px;
+  padding: 32px;
+  overflow-x: auto;
+}
+
+.results-log pre {
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  color: #888;
+  line-height: 1.8;
+  margin: 0;
+}
+
+.empty-state {
+  min-height: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.empty-state p {
+  color: #555;
+  font-size: 14px;
+}
+
+/* Mobile Adjustments */
+@media (max-width: 768px) {
+  .app {
+    padding: 40px 20px;
+  }
+
+  .card {
+    padding: 32px 24px;
+  }
+
+  .header h1 {
+    font-size: 32px;
+  }
+}
