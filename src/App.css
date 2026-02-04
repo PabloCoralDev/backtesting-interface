@@ -401,14 +401,121 @@ select.input {
 /* Mobile Adjustments */
 @media (max-width: 768px) {
   .app {
-    padding: 40px 20px;
+    padding: 20px 12px;
   }
 
-  .card {
-    padding: 32px 24px;
+  .header {
+    margin-bottom: 30px;
   }
 
   .header h1 {
-    font-size: 32px;
+    font-size: 24px;
+  }
+
+  .header p {
+    font-size: 12px;
+  }
+
+  .controls-horizontal {
+    gap: 16px;
+    padding: 16px;
+  }
+
+  .label {
+    font-size: 9px;
+    margin-bottom: 8px;
+  }
+
+  /* Smaller inputs on mobile */
+  .input {
+    height: 40px;
+    font-size: 12px;
+    padding: 0 12px;
+    border-radius: 8px;
+  }
+
+  /* Make date inputs much smaller on mobile */
+  input[type="date"].input {
+    height: 36px;
+    font-size: 10px;
+    padding: 0 6px;
+    width: 140px;
+    max-width: 140px;
+    min-width: 140px;
+  }
+
+  select.input {
+    background-position: right 12px center;
+  }
+
+  .dollar-sign {
+    left: 12px;
+    font-size: 12px;
+  }
+
+  .input-wrapper .input {
+    padding-left: 28px;
+  }
+
+  /* Smaller strategy buttons on mobile */
+  .strategy-btn {
+    padding: 10px 12px;
+    border-radius: 8px;
+  }
+
+  .btn-title {
+    font-size: 11px;
+    margin-bottom: 2px;
+  }
+
+  .btn-desc {
+    font-size: 9px;
+  }
+
+  /* Smaller run button on mobile */
+  .run-btn {
+    min-height: 40px;
+    font-size: 12px;
+    padding: 12px;
+    border-radius: 8px;
+  }
+
+  .card {
+    padding: 20px 16px;
+    border-radius: 12px;
+  }
+
+  .results {
+    gap: 20px;
+  }
+
+  .results-metrics {
+    gap: 12px;
+    grid-template-columns: 1fr;
+  }
+
+  .metric {
+    padding: 16px;
+  }
+
+  .metric-value {
+    font-size: 24px;
+  }
+
+  .results-summary {
+    padding: 16px;
+  }
+
+  .results-summary pre {
+    font-size: 11px;
+  }
+
+  .error-banner {
+    padding: 12px 16px;
+    font-size: 12px;
+  }
+
+  .error-text {
+    font-size: 9px;
   }
 }

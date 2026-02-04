@@ -56,6 +56,35 @@ function App() {
   const [results, setResults] = useState<BacktestResponse | null>(null)
   const [apiError, setApiError] = useState('')
 
+  // Calculate max date (2 months ago from today)
+  const getMaxDate = () => {
+    const today = new Date()
+    today.setMonth(today.getMonth() - 2)
+    return today.toISOString().split('T')[0]
+  }
+
+  const maxDate = getMaxDate()
+
+  // Validate date is not within past 2 months
+  const isDateValid = (dateStr: string) => {
+    if (!dateStr) return true
+    const selectedDate = new Date(dateStr)
+    const maxAllowedDate = new Date(maxDate)
+    return selectedDate <= maxAllowedDate
+  }
+
+  const handleStartDate = (dateStr: string) => {
+    if (isDateValid(dateStr)) {
+      setStartDate(dateStr)
+    }
+  }
+
+  const handleEndDate = (dateStr: string) => {
+    if (isDateValid(dateStr)) {
+      setEndDate(dateStr)
+    }
+  }
+
   const handleAmount = (val: string) => {
     const clean = val.replace(/[$\s,]/g, '')
 
@@ -166,8 +195,8 @@ function App() {
     <div className="app">
       <div className="container">
         <header className="header">
-          <h1>Backtesting Dashboard</h1>
-          <p>Configure parameters and analyze results</p>
+          <h1>Backtesting Interface</h1>
+          <p>Test with prebuilt strategies. Only use data up to July 2025.</p>
         </header>
 
         {/* Controls - Horizontal Layout */}
@@ -224,8 +253,8 @@ function App() {
             <input
               type="date"
               value={startDate}
-              onChange={e => setStartDate(e.target.value)}
-              max={endDate || undefined}
+              onChange={e => handleStartDate(e.target.value)}
+              max={endDate || maxDate}
               className="input"
             />
           </div>
@@ -236,8 +265,9 @@ function App() {
             <input
               type="date"
               value={endDate}
-              onChange={e => setEndDate(e.target.value)}
+              onChange={e => handleEndDate(e.target.value)}
               min={startDate || undefined}
+              max={maxDate}
               className="input"
             />
           </div>
