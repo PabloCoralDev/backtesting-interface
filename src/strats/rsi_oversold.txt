@@ -1,0 +1,2 @@
+import backtrader as bt\n\nclass RSIOversold(bt.Strategy):\n    params = (('period', 14), ('oversold', 30), ('overbought', 70),)\n\n    def __init__(self):\n        self.rsi = bt.indicators.RSI(period=self.params.period)\n\n    def next(self):\n        if not self.position:\n            if self.rsi < self.params.oversold:\n                self.buy()\n        elif self.rsi > self.params.overbought:\n            self.sell()
+

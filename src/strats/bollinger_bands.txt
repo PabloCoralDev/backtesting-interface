@@ -1,0 +1,2 @@
+import backtrader as bt\n\nclass BollingerMeanReversion(bt.Strategy):\n    params = (('period', 20), ('devfactor', 2.0),)\n\n    def __init__(self):\n        self.boll = bt.indicators.BollingerBands(\n            period=self.params.period,\n            devfactor=self.params.devfactor\n        )\n\n    def next(self):\n        if not self.position:\n            if self.data.close < self.boll.lines.bot:\n                self.buy()\n        elif self.data.close > self.boll.lines.top:\n            self.sell()
+

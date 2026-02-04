@@ -39,7 +39,8 @@
 /* Horizontal Controls */
 .controls-horizontal {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: 1fr 1fr 1.5fr 1fr;
+  grid-template-rows: 1fr 1fr;
   gap: 24px;
   margin-bottom: 40px;
   background: #0a0a0a;
@@ -51,11 +52,73 @@
 .control-section {
   display: flex;
   flex-direction: column;
+  min-width: 0;
+}
+
+/* Investment - row 1, col 1 */
+.control-section:nth-child(1) {
+  grid-row: 1;
+  grid-column: 1;
+}
+
+/* Stock - row 1, col 2 */
+.control-section:nth-child(2) {
+  grid-row: 1;
+  grid-column: 2;
+}
+
+/* Strategy - spans 2 rows, col 3 */
+.control-section:nth-child(3) {
+  grid-row: 1 / 3;
+  grid-column: 3;
+}
+
+/* Start Date - row 2, col 1 */
+.control-section:nth-child(4) {
+  grid-row: 2;
+  grid-column: 1;
+}
+
+/* End Date - row 2, col 2 */
+.control-section:nth-child(5) {
+  grid-row: 2;
+  grid-column: 2;
+}
+
+/* Run button - spans 2 rows, col 4 */
+.control-section:nth-child(6) {
+  grid-row: 1 / 3;
+  grid-column: 4;
+}
+
+@media (max-width: 1024px) {
+  .controls-horizontal {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto auto;
+  }
+
+  .control-section:nth-child(3) {
+    grid-column: 1 / -1;
+    grid-row: auto;
+  }
+
+  .control-section:nth-child(6) {
+    grid-column: 1 / -1;
+    grid-row: auto;
+  }
 }
 
 @media (max-width: 768px) {
   .controls-horizontal {
     grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    padding: 24px;
+  }
+
+  .control-section:nth-child(3),
+  .control-section:nth-child(6) {
+    grid-column: auto;
+    grid-row: auto;
   }
 }
 
@@ -86,19 +149,21 @@
   display: block;
   font-size: 10px;
   text-transform: uppercase;
-  letter-spacing: 1.5px;
+  letter-spacing: 1.2px;
   color: #666;
   font-weight: 600;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Strategy Buttons */
 .button-group {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   gap: 12px;
-  flex-wrap: wrap;
+  height: 100%;
 }
 
 .strategy-btn {
@@ -108,20 +173,22 @@
   padding: 16px 20px;
   color: #888;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s ease;
   text-align: center;
   flex: 1;
-  min-width: 100px;
+  box-shadow: 0 0 0 rgba(255, 255, 255, 0);
 }
 
 .strategy-btn:hover {
-  border-color: #333;
+  border-color: #444;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
 }
 
 .strategy-btn.active {
   background: #fff;
   color: #000;
   border-color: #fff;
+  box-shadow: 0 0 30px rgba(255, 255, 255, 0.3), 0 0 60px rgba(255, 255, 255, 0.15);
 }
 
 .btn-title {
@@ -146,20 +213,24 @@
   background: #111;
   border: 2px solid #222;
   border-radius: 12px;
-  padding: 0 20px;
-  font-size: 15px;
+  padding: 0 16px;
+  font-size: 14px;
   color: #fff;
   text-align: center;
   outline: none;
-  transition: border-color 0.2s;
+  transition: all 0.3s ease;
+  min-width: 0;
+  box-shadow: 0 0 0 rgba(255, 255, 255, 0);
 }
 
 .input:focus {
-  border-color: #444;
+  border-color: #666;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.15);
 }
 
 .input.error {
   border-color: #dc2626;
+  box-shadow: 0 0 20px rgba(220, 38, 38, 0.3);
 }
 
 select.input {
@@ -167,7 +238,7 @@ select.input {
   appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right 20px center;
+  background-position: right 16px center;
 }
 
 .input-wrapper {
@@ -176,29 +247,30 @@ select.input {
 
 .dollar-sign {
   position: absolute;
-  left: 24px;
+  left: 20px;
   top: 50%;
   transform: translateY(-50%);
   color: #666;
-  font-size: 16px;
+  font-size: 14px;
   pointer-events: none;
 }
 
 .input-wrapper .input {
-  padding-left: 48px;
+  padding-left: 40px;
 }
 
 .error-text {
   color: #dc2626;
-  font-size: 12px;
-  margin-top: 12px;
+  font-size: 10px;
+  margin-top: 8px;
 }
 
 
 /* Run Button */
 .run-btn {
   width: 100%;
-  height: 64px;
+  height: 100%;
+  min-height: 120px;
   background: #111;
   border: 2px solid #222;
   border-radius: 12px;
@@ -206,7 +278,13 @@ select.input {
   font-size: 14px;
   font-weight: 600;
   cursor: not-allowed;
-  transition: all 0.2s;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 0 0 rgba(255, 255, 255, 0);
 }
 
 .run-btn.active {
@@ -214,39 +292,84 @@ select.input {
   color: #000;
   border-color: #fff;
   cursor: pointer;
+  box-shadow: 0 0 40px rgba(255, 255, 255, 0.4), 0 0 80px rgba(255, 255, 255, 0.2);
 }
 
 .run-btn.active:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 20px 40px rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 0 50px rgba(255, 255, 255, 0.5), 0 0 100px rgba(255, 255, 255, 0.3);
+}
+
+@media (max-width: 1024px) {
+  .run-btn {
+    min-height: 56px;
+  }
 }
 
 /* Results */
-.chart-placeholder {
+.chart-container {
   width: 100%;
-  height: 400px;
   background: #111;
   border: 2px solid #222;
   border-radius: 12px;
+  overflow: hidden;
+}
+
+.chart-image {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.results-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.metric {
+  background: #111;
+  border: 2px solid #222;
+  border-radius: 12px;
+  padding: 24px;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #555;
-  font-family: 'Courier New', monospace;
-  font-size: 14px;
+  flex-direction: column;
+  gap: 12px;
 }
 
-.results-log {
+.metric-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: #666;
+  font-weight: 600;
+}
+
+.metric-value {
+  font-size: 32px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.metric-value.positive {
+  color: #10b981;
+}
+
+.metric-value.negative {
+  color: #ef4444;
+}
+
+.results-summary {
   background: #111;
   border: 2px solid #222;
   border-radius: 12px;
-  padding: 32px;
-  overflow-x: auto;
+  padding: 24px;
 }
 
-.results-log pre {
+.results-summary pre {
   font-family: 'Courier New', monospace;
-  font-size: 14px;
+  font-size: 13px;
   color: #888;
   line-height: 1.8;
   margin: 0;
@@ -262,6 +385,17 @@ select.input {
 .empty-state p {
   color: #555;
   font-size: 14px;
+}
+
+/* Error Banner */
+.error-banner {
+  background: #1a0a0a;
+  border: 2px solid #dc2626;
+  border-radius: 12px;
+  padding: 16px 24px;
+  color: #ef4444;
+  font-size: 14px;
+  margin-bottom: 20px;
 }
 
 /* Mobile Adjustments */
