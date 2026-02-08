@@ -3,6 +3,8 @@ import './App.css'
 import bollingerBands from './strats/bollinger_bands.txt?raw'
 import rsiOversold from './strats/rsi_oversold.txt?raw'
 import smaCrossover from './strats/sma_crossover.txt?raw' //important step to extract actual content
+import CandlestickChart from './components/CandlestickChart'
+import type { Time } from 'lightweight-charts'
 
 const STOCK_SYMBOLS = [
   'AAPL', 'GOOGL', 'MSFT', 'AMZN', 'TSLA', 'META', 'NVDA', 'JPM',
@@ -30,17 +32,50 @@ const STRATEGIES = [
     params: {period: 14, oversold: 30, overbought: 70} }
 ]
 
+// Backend candle format
+interface BackendCandle {
+  datetime: string
+  open: number
+  high: number
+  low: number
+  close: number
+  volume: number
+}
+
+// Backend equity point format
+interface EquityData {
+  datetime: string
+  equity: number
+}
+
+// Frontend chart format (for lightweight-charts)
+interface CandleData {
+  time: Time
+  open: number
+  high: number
+  low: number
+  close: number
+}
+
+interface VolumeData {
+  time: Time
+  value: number
+  color?: string
+}
+
+// Backend response
 interface BacktestResponse {
-  chart_url: string,
+  success: boolean
   metrics: {
-    final_value: number,
-    initial_value: number,
-    max_drawdown: number,
-    sharpe_ratio: number,
+    final_value: number
+    initial_value: number
+    max_drawdown: number
+    sharpe_ratio: number
     total_return: number
-  },
-  strategy_name: string,
-  success: boolean,
+  }
+  strategy_name: string
+  candles: BackendCandle[]
+  equity: EquityData[]
 }
 
 function App() {
@@ -163,6 +198,9 @@ function App() {
 
       console.log('Backtest payload:', payload)
 
+      const API_URL = 'https://backtesting-mini-engine-v1-hc8o.onrender.com/backtest'
+      const TEST_API_URL = 'http://localhost:8000/backtest'
+
       const response = await fetch('https://backtesting-mini-engine-v1-hc8o.onrender.com/backtest', {
         method: 'POST',
         headers: {
@@ -189,6 +227,50 @@ function App() {
     } finally {
       setLoading(false)
     }
+  }
+
+  // Convert backend candle data to frontend chart format
+  const convertCandlesToChartData = (candles: BackendCandle[]) => {
+    // Filter out any candles with invalid datetime and convert to proper format
+    const priceData: CandleData[] = candles
+      .filter(candle => candle.datetime)
+      .map(candle => {
+        // Extract just the date part (YYYY-MM-DD) from datetime string
+        // This handles both 'YYYY-MM-DD' and 'YYYY-MM-DDTHH:MM:SS' formats
+        const dateStr = candle.datetime.split('T')[0] as Time
+        return {
+          time: dateStr,
+          open: candle.open,
+          high: candle.high,
+          low: candle.low,
+          close: candle.close
+        }
+      })
+
+    const volumeData: VolumeData[] = candles
+      .filter(candle => candle.datetime)
+      .map(candle => {
+        const dateStr = candle.datetime.split('T')[0] as Time
+        return {
+          time: dateStr,
+          value: candle.volume
+        }
+      })
+
+    return { priceData, volumeData }
+  }
+
+  // Convert backend equity data to frontend chart format
+  const convertEquityToChartData = (equity: EquityData[]) => {
+    return equity
+      .filter(point => point.datetime)
+      .map(point => {
+        const dateStr = point.datetime.split('T')[0] as Time
+        return {
+          time: dateStr,
+          value: point.equity
+        }
+      })
   }
 
   return (
@@ -301,11 +383,18 @@ function App() {
                 <div className="card">
                   <label className="label">Performance Chart</label>
                   <div className="chart-container">
-                    <img
-                      src={`${results.chart_url}`} //already comes prefixed from backend
-                      alt="Backtest Performance Chart"
-                      className="chart-image"
-                    />
+                    {results.candles && results.candles.length > 0 ? (
+                      <CandlestickChart
+                        priceData={convertCandlesToChartData(results.candles).priceData}
+                        volumeData={convertCandlesToChartData(results.candles).volumeData}
+                        equityData={results.equity ? convertEquityToChartData(results.equity) : []}
+                        height={500}
+                      />
+                    ) : (
+                      <div className="empty-state">
+                        <p>No chart data available</p>
+                      </div>
+                    )}
                   </div>
                 </div>
 
