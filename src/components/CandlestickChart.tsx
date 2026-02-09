@@ -58,6 +58,7 @@ export default function CandlestickChart({
   const chartContainerRef = useRef<HTMLDivElement>(null)
   const chartRef = useRef<IChartApi | null>(null)
   const resizeObserverRef = useRef<ResizeObserver | null>(null)
+  const legendRef = useRef<HTMLDivElement>(null)
 
   // Color palette for indicators
   const indicatorColors = [
@@ -111,6 +112,8 @@ export default function CandlestickChart({
       borderUpColor: '#4bffb5',
       wickDownColor: '#838ca1',
       wickUpColor: '#838ca1',
+      lastValueVisible: false,
+      priceLineVisible: false,
     })
 
     candleSeries.setData(priceData)
@@ -126,6 +129,8 @@ export default function CandlestickChart({
           type: 'volume',
         },
         priceScaleId: '',
+        lastValueVisible: false,
+        priceLineVisible: false,
       })
 
       volumeSeries.setData(volumeData)
@@ -150,6 +155,8 @@ export default function CandlestickChart({
           precision: 2,
           minMove: 0.01,
         },
+        lastValueVisible: false,
+        priceLineVisible: false,
       })
 
       equitySeries.setData(equityData)
@@ -173,6 +180,8 @@ export default function CandlestickChart({
               precision: 2,
               minMove: 0.01,
             },
+            lastValueVisible: false,
+            priceLineVisible: false,
           })
 
           indicatorSeries.setData(lineData)

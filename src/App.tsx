@@ -227,11 +227,11 @@ function App() {
       const TEST_API_URL = 'http://127.0.0.1:8000/backtest'
 
       // Choose which API to use
-      const API_URL = TEST_API_URL  // Change to PROD_API_URL for production
+      const API_URL = PROD_API_URL  // Change to PROD_API_URL for production
 
-      console.log('🌐 Calling backend at:', API_URL)
+      console.log('🌐 Calling backend at:', TEST_API_URL)
 
-      const response = await fetch(API_URL, {
+      const response = await fetch(TEST_API_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
