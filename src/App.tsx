@@ -229,7 +229,7 @@ function App() {
       // Choose which API to use
       const API_URL = PROD_API_URL  // Change to PROD_API_URL for production
 
-      console.log('🌐 Calling backend at:', TEST_API_URL)
+      console.log('Calling backend at:', TEST_API_URL)
 
       const response = await fetch(TEST_API_URL, {
         method: 'POST',
@@ -239,18 +239,18 @@ function App() {
         body: JSON.stringify(payload)
       })
 
-      console.log('✅ Response status:', response.status, response.statusText)
+      console.log('Response status:', response.status, response.statusText)
 
       if (!response.ok) {
         // Try to get error details from response
         let errorDetail = `${response.status} ${response.statusText}`
         try {
           const errorJson = await response.json()
-          console.error('❌ Backend error details:', errorJson)
+          console.error('Backend error details:', errorJson)
           errorDetail = errorJson.detail || errorJson.message || JSON.stringify(errorJson)
         } catch (e) {
           const errorText = await response.text()
-          console.error('❌ Backend error text:', errorText)
+          console.error('Backend error text:', errorText)
           errorDetail = errorText || errorDetail
         }
         throw new Error(`API Error: ${errorDetail}`)
@@ -258,10 +258,10 @@ function App() {
 
       const json = await response.json()
       const data = json as BacktestResponse
-      console.log('📦 Raw backend response:', json)
-      console.log('📊 Backtest results:', data)
-      console.log('📈 Indicators received:', data.indicators)
-      console.log('💰 Trades received:', data.trades)
+      console.log('Raw backend response:', json)
+      console.log('Backtest results:', data)
+      console.log('Indicators received:', data.indicators)
+      console.log('Trades received:', data.trades)
 
       setResults(data)
       setShowResults(true)
@@ -282,7 +282,8 @@ function App() {
     const priceData: CandleData[] = candles
       .filter(candle => candle.datetime)
       .map(candle => {
-        // Extract just the date part (YYYY-MM-DD) from datetime string
+        // Extract just the date part (YYYY-MM-DD) from dat
+        // etime string
         // This handles both 'YYYY-MM-DD' and 'YYYY-MM-DDTHH:MM:SS' formats
         const dateStr = candle.datetime.split('T')[0] as Time
         return {
