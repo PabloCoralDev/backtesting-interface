@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { createChart, CrosshairMode, CandlestickSeries, HistogramSeries, LineSeries } from 'lightweight-charts'
+import { createChart, CrosshairMode, CandlestickSeries, LineSeries, HistogramSeries } from 'lightweight-charts'
 import type { IChartApi, Time } from 'lightweight-charts'
 
 interface CandleData {
@@ -21,10 +21,29 @@ interface EquityData {
   value: number
 }
 
+interface LineData {
+  time: Time
+  value: number
+}
+
+interface IndicatorsData {
+  [indicatorName: string]: {
+    [lineName: string]: LineData[]
+  }
+}
+
+interface TradeMarker {
+  time: Time
+  type: 'buy' | 'sell'
+  price?: number
+}
+
 interface CandlestickChartProps {
   priceData: CandleData[]
   volumeData?: VolumeData[]
   equityData?: EquityData[]
+  indicatorsData?: IndicatorsData
+  trades?: TradeMarker[]
   height?: number
 }
 
@@ -32,11 +51,25 @@ export default function CandlestickChart({
   priceData,
   volumeData = [],
   equityData = [],
+  indicatorsData = {},
+  trades = [],
   height = 400
 }: CandlestickChartProps) {
   const chartContainerRef = useRef<HTMLDivElement>(null)
   const chartRef = useRef<IChartApi | null>(null)
   const resizeObserverRef = useRef<ResizeObserver | null>(null)
+
+  // Color palette for indicators
+  const indicatorColors = [
+    '#26a69a', // Teal
+    '#ef5350', // Red
+    '#ab47bc', // Purple
+    '#ffa726', // Orange
+    '#42a5f5', // Blue
+    '#66bb6a', // Green
+    '#ec407a', // Pink
+    '#ffee58', // Yellow
+  ]
 
   useEffect(() => {
     if (!chartContainerRef.current) return
@@ -82,6 +115,9 @@ export default function CandlestickChart({
 
     candleSeries.setData(priceData)
 
+    // TODO: Add buy/sell markers - requires different API in v5
+    // Markers functionality will be added after chart is working
+
     // Add volume series if data provided
     if (volumeData.length > 0) {
       const volumeSeries = chartRef.current.addSeries(HistogramSeries, {
@@ -119,6 +155,32 @@ export default function CandlestickChart({
       equitySeries.setData(equityData)
     }
 
+    // Add indicator lines if data provided
+    if (Object.keys(indicatorsData).length > 0) {
+      let colorIndex = 0
+
+      for (const [indicatorName, lines] of Object.entries(indicatorsData)) {
+        for (const [lineName, lineData] of Object.entries(lines)) {
+          if (lineData.length === 0) continue
+
+          const indicatorSeries = chartRef.current.addSeries(LineSeries, {
+            color: indicatorColors[colorIndex % indicatorColors.length],
+            lineWidth: 2,
+            priceScaleId: 'right',
+            title: `${indicatorName}.${lineName}`,
+            priceFormat: {
+              type: 'price',
+              precision: 2,
+              minMove: 0.01,
+            },
+          })
+
+          indicatorSeries.setData(lineData)
+          colorIndex++
+        }
+      }
+    }
+
     // Fit content to show all data
     chartRef.current.timeScale().fitContent()
 
@@ -129,7 +191,7 @@ export default function CandlestickChart({
         chartRef.current = null
       }
     }
-  }, [priceData, volumeData, equityData, height])
+  }, [priceData, volumeData, equityData, indicatorsData, trades, height])
 
   // Handle resize
   useEffect(() => {

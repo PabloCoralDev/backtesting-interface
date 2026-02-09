@@ -48,6 +48,24 @@ interface EquityData {
   equity: number
 }
 
+// Backend indicator data point (can have different fields per indicator)
+interface IndicatorDataPoint {
+  datetime: string
+  [key: string]: string | number | null  // Flexible for different indicator fields
+}
+
+// Backend indicators (object with indicator names as keys)
+interface BackendIndicators {
+  [indicatorName: string]: IndicatorDataPoint[]
+}
+
+// Backend trade signal
+interface TradeSignal {
+  datetime: string
+  type: 'buy' | 'sell'
+  price?: number
+}
+
 // Frontend chart format (for lightweight-charts)
 interface CandleData {
   time: Time
@@ -63,6 +81,11 @@ interface VolumeData {
   color?: string
 }
 
+interface LineData {
+  time: Time
+  value: number
+}
+
 // Backend response
 interface BacktestResponse {
   success: boolean
@@ -76,6 +99,8 @@ interface BacktestResponse {
   strategy_name: string
   candles: BackendCandle[]
   equity: EquityData[]
+  indicators?: BackendIndicators
+  trades?: TradeSignal[]
 }
 
 function App() {
@@ -130,7 +155,7 @@ function App() {
       return
     }
 
-    if (/^\d*\.?\d*$/.test(clean)) {
+    if (/^\d*\.?\d*$/.test(clean)) { 
       setAmount(clean)
       setError('')
 
@@ -198,10 +223,15 @@ function App() {
 
       console.log('Backtest payload:', payload)
 
-      const API_URL = 'https://backtesting-mini-engine-v1-hc8o.onrender.com/backtest'
-      const TEST_API_URL = 'http://localhost:8000/backtest'
+      const PROD_API_URL = 'https://backtesting-mini-engine-v1-hc8o.onrender.com/backtest'
+      const TEST_API_URL = 'http://127.0.0.1:8000/backtest'
 
-      const response = await fetch('https://backtesting-mini-engine-v1-hc8o.onrender.com/backtest', {
+      // Choose which API to use
+      const API_URL = TEST_API_URL  // Change to PROD_API_URL for production
+
+      console.log('🌐 Calling backend at:', API_URL)
+
+      const response = await fetch(API_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -209,14 +239,31 @@ function App() {
         body: JSON.stringify(payload)
       })
 
+      console.log('✅ Response status:', response.status, response.statusText)
+
       if (!response.ok) {
-        throw new Error(`API Error: ${response.status} ${response.statusText}`)
+        // Try to get error details from response
+        let errorDetail = `${response.status} ${response.statusText}`
+        try {
+          const errorJson = await response.json()
+          console.error('❌ Backend error details:', errorJson)
+          errorDetail = errorJson.detail || errorJson.message || JSON.stringify(errorJson)
+        } catch (e) {
+          const errorText = await response.text()
+          console.error('❌ Backend error text:', errorText)
+          errorDetail = errorText || errorDetail
+        }
+        throw new Error(`API Error: ${errorDetail}`)
       }
 
       const json = await response.json()
       const data = json as BacktestResponse
+      console.log('📦 Raw backend response:', json)
+      console.log('📊 Backtest results:', data)
+      console.log('📈 Indicators received:', data.indicators)
+      console.log('💰 Trades received:', data.trades)
+
       setResults(data)
-      console.log('Backtest results:', data)
       setShowResults(true)
     } 
     
@@ -271,6 +318,55 @@ function App() {
           value: point.equity
         }
       })
+  }
+
+  // Convert backend indicators to frontend chart format
+  const convertIndicatorsToChartData = (indicators: BackendIndicators) => {
+    const result: { [indicatorName: string]: { [lineName: string]: LineData[] } } = {}
+
+    console.log('Converting indicators:', indicators)
+
+    for (const [indicatorName, dataPoints] of Object.entries(indicators)) {
+      result[indicatorName] = {}
+
+      // Determine what fields this indicator has (excluding datetime)
+      const samplePoint = dataPoints.find(p => p.datetime)
+      if (!samplePoint) {
+        console.log(`No valid sample point for ${indicatorName}`)
+        continue
+      }
+
+      const fields = Object.keys(samplePoint).filter(key => key !== 'datetime')
+      console.log(`Indicator ${indicatorName} has fields:`, fields)
+
+      // For each field, create a line series
+      for (const field of fields) {
+        const lineData: LineData[] = dataPoints
+          .filter(point => point.datetime && point[field] !== null)
+          .map(point => {
+            const dateStr = point.datetime.split('T')[0] as Time
+            return {
+              time: dateStr,
+              value: point[field] as number
+            }
+          })
+
+        console.log(`${indicatorName}.${field}: ${lineData.length} points`)
+        result[indicatorName][field] = lineData
+      }
+    }
+
+    console.log('Converted indicators result:', result)
+    return result
+  }
+
+  // Convert backend trades to frontend chart markers
+  const convertTradesToMarkers = (trades: TradeSignal[]) => {
+    return trades.map(trade => ({
+      time: trade.datetime.split('T')[0] as Time,
+      type: trade.type,
+      price: trade.price
+    }))
   }
 
   return (
@@ -388,6 +484,8 @@ function App() {
                         priceData={convertCandlesToChartData(results.candles).priceData}
                         volumeData={convertCandlesToChartData(results.candles).volumeData}
                         equityData={results.equity ? convertEquityToChartData(results.equity) : []}
+                        indicatorsData={results.indicators ? convertIndicatorsToChartData(results.indicators) : {}}
+                        trades={results.trades ? convertTradesToMarkers(results.trades) : []}
                         height={500}
                       />
                     ) : (
